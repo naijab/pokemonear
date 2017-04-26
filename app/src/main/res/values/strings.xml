@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">PokemoNear</string>
+
+    <string name="login">Login</string>
+    <string name="login_error">Can\'t Login, Email or Password is not correct.</string>
+    <string name="login_email">Email</string>
+    <string name="login_password">Password</string>
+    <string name="login_email_fail">Email not correct.</string>
+    <string name="try_again">Try Again</string>
+    <string name="network_is_disconnect">Network is disconnect.</string>
+    <string name="pokemon_near_you">Pokemon near you</string>
+    <string name="server_active">Server Active</string>
+    <string name="server_deactivate">Server Deactivate</string>
+    <string name="title_activity_maps">Map</string>
+
+    <string name="google_map_key">AIzaSyBPZLcLcDuvf78LZP9DXC6RajjL29vtOTg</string>
+
 </resources>
