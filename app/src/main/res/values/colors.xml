@@ -5,4 +5,5 @@
     <color name="colorAccent">#2196F3</color>
     <color name="colorAccentDark">#1976D2</color>
     <color name="colorNormalText">#424242</color>
+    <color name="colorFillCircle">#36ff54</color>
 </resources>

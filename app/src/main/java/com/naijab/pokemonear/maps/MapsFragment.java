@@ -1,34 +1,50 @@
-package com.naijab.pokemonear.home;
+package com.naijab.pokemonear.maps;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.content.pm.PackageManager;
-import android.os.Build;
+import android.graphics.Color;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.naijab.pokemonear.R;
 
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
+
+    public static final int ZOOM_LEVEL_SIZE = 18;
+    public static final int RADIUS_METER = 2000;
+    public static final int MY_LOCATION_REQUEST_CODE = 66;
+    public static final int STROKE_WIDTH = 8;
+    public static final int CIRCLE_FILL_COLOR = 0x3000ff00;
+
 
     private MapView mapView;
     private GoogleMap mMap;
-    private Circle mCircle;
+    private int n;
+
 
     public MapsFragment() {
         super();
@@ -53,6 +69,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         initInstances(rootView, savedInstanceState);
         return rootView;
@@ -68,46 +85,90 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mapView = (MapView) rootView.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
-
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-
-        int strokeColor = 0xffff0000; //red outline
-        int shadeColor = 0x44ff0000; //opaque red fill
-
+        LatLng position = new LatLng(13.744728, 100.56340);
         mMap = googleMap;
+        initMapsView();
+        setCircle(position, RADIUS_METER);
+        setMarker(position);
+        setCamera(position, ZOOM_LEVEL_SIZE);
 
-        LatLng sydney = new LatLng(13.744728, 100.56340);
+        Random rand = new Random();
+        n = rand.nextInt(50000) + 2;
 
+        Timer time = new Timer();
+        time.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Random rand = new Random();
+                int a = rand.nextInt(20000) + 2;
+                getLatLngFromMyLocation(a);
+            }
+        },0, n);
 
-        if ( Build.VERSION.SDK_INT >= 23 &&
-                ContextCompat.checkSelfPermission( getActivity(),
-                        android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission( getActivity(),
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return  ;
+    }
+
+    private void getLatLngFromMyLocation(final int a) {
+
+        Timer time = new Timer();
+        time.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Random rand = new Random();
+                int f = rand.nextInt(99) + 1;
+                Log.i("MapFragment","f = " + f);
+                Log.i("MapFragment","a = " + a);
+            }
+        },0, a);
+    }
+
+    private void initMapsView() {
+        if (ActivityCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getActivity(),
+                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(false);
+        } else {
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setCompassEnabled(true);
+            mMap.setContentDescription("Him is me.");
         }
 
-        mMap.setMyLocationEnabled(false);
-        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setMapToolbarEnabled(true);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
-        mMap.getUiSettings().setCompassEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.setBuildingsEnabled(false);
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+    }
 
+    private void setCircle(LatLng position, int RadiusMeter) {
         CircleOptions circleOptions = new CircleOptions()
-                .center(sydney)
-                .radius(2000)
-                .fillColor(shadeColor)
-                .strokeColor(strokeColor).strokeWidth(8);
+                .center(position)
+                .radius(RadiusMeter)
+                .fillColor(CIRCLE_FILL_COLOR)
+                .strokeColor(Color.RED).strokeWidth(STROKE_WIDTH);
 
-        mCircle = mMap.addCircle(circleOptions);
+        mMap.addCircle(circleOptions);
+    }
 
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom((sydney), 18);
+    private void setMarker(LatLng position) {
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                .title("Center of World")
+//                     .snippet("I am Ultron")
+                .position(position);
+        Marker locationMarker = mMap.addMarker(markerOptions);
+        locationMarker.showInfoWindow();
+    }
+
+    private void setCamera(LatLng position, int ZoomLevelSize) {
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom((position), ZoomLevelSize);
         mMap.animateCamera(cameraUpdate);
     }
+
 
     @Override
     public void onResume() {
@@ -143,6 +204,5 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private void onRestoreInstanceState(Bundle savedInstanceState) {
         // Restore Instance (Fragment level's variables) State here
     }
-
 
 }

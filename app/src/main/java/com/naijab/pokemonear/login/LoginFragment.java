@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.naijab.pokemonear.R;
-import com.naijab.pokemonear.home.MapsActivity;
+import com.naijab.pokemonear.maps.MapsActivity;
 
 public class LoginFragment extends Fragment {
 

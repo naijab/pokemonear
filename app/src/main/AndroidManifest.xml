@@ -28,7 +28,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".home.MapsActivity"></activity>
+        <activity android:name=".maps.MapsActivity"></activity>
         <activity
             android:name=".login.LoginActivity"
             android:theme="@style/AppThemeNoActionBar">

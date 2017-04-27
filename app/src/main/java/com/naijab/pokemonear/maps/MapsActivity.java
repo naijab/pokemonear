@@ -1,4 +1,4 @@
-package com.naijab.pokemonear.home;
+package com.naijab.pokemonear.maps;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
