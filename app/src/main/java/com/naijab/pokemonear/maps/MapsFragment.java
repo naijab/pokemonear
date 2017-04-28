@@ -3,18 +3,14 @@ package com.naijab.pokemonear.maps;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,11 +36,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     public static final int STROKE_WIDTH = 8;
     public static final int CIRCLE_FILL_COLOR = 0x3000ff00;
 
-
     private MapView mapView;
     private GoogleMap mMap;
     private int n;
-
 
     public MapsFragment() {
         super();
@@ -62,8 +56,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
         init(savedInstanceState);
 
-        if (savedInstanceState != null)
+        if (savedInstanceState != null) {
             onRestoreInstanceState(savedInstanceState);
+        }
     }
 
     @Override
@@ -80,6 +75,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
+
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
         mapView = (MapView) rootView.findViewById(R.id.map);
@@ -90,24 +86,29 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LatLng position = new LatLng(13.744728, 100.56340);
+
         mMap = googleMap;
+
         initMapsView();
         setCircle(position, RADIUS_METER);
         setMarker(position);
         setCamera(position, ZOOM_LEVEL_SIZE);
 
-        Random rand = new Random();
-        n = rand.nextInt(50000) + 2;
-
-        Timer time = new Timer();
-        time.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Random rand = new Random();
-                int a = rand.nextInt(20000) + 2;
-                getLatLngFromMyLocation(a);
-            }
-        },0, n);
+        for (int i = 0; i < RADIUS_METER; i++) {
+            setMarker(position);
+        }
+//        Random rand = new Random();
+//        n = rand.nextInt(50000) + 2;
+//
+//        Timer time = new Timer();
+//        time.schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                Random rand = new Random();
+//                int a = rand.nextInt(20000) + 2;
+//                getLatLngFromMyLocation(a);
+//            }
+//        }, 0, n);
 
     }
 
@@ -119,10 +120,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             public void run() {
                 Random rand = new Random();
                 int f = rand.nextInt(99) + 1;
-                Log.i("MapFragment","f = " + f);
-                Log.i("MapFragment","a = " + a);
+                Log.i("MapFragment", "f = " + f);
+                Log.i("MapFragment", "a = " + a);
             }
-        },0, a);
+        }, 0, a);
     }
 
     private void initMapsView() {
@@ -142,6 +143,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.setBuildingsEnabled(false);
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+
     }
 
     private void setCircle(LatLng position, int RadiusMeter) {
@@ -170,6 +173,18 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     }
 
 
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
+    }
+
+    @SuppressWarnings("UnusedParameters")
+    private void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Restore Instance (Fragment level's variables) State here
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -192,17 +207,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
-    }
-
-    @SuppressWarnings("UnusedParameters")
-    private void onRestoreInstanceState(Bundle savedInstanceState) {
-        // Restore Instance (Fragment level's variables) State here
     }
 
 }
