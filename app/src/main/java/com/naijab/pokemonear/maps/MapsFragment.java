@@ -2,8 +2,6 @@ package com.naijab.pokemonear.maps;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -54,6 +52,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private Thread thread;
     private Handler handler = new Handler();
+    BitmapDescriptor icon;
 
     public MapsFragment() {
         super();
@@ -114,8 +113,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap = googleMap;
         initMapsView();
         setCircle(position, RADIUS_METER);
-        setMarker(position, userEmail, String.valueOf(15));
+        setMarkerCenter(position, userEmail);
         setCamera(position, ZOOM_LEVEL_SIZE);
+    }
+
+    private void setMarkerCenter(LatLng position, String userEmail) {
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.title("Name: " + userEmail)
+                .position(position);
+        Marker locationMarker = mMap.addMarker(markerOptions);
+        locationMarker.showInfoWindow();
     }
 
     private long getRandomTime() {
@@ -144,7 +151,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.addCircle(circleOptions);
     }
 
-    BitmapDescriptor icon;
+
     private void setMarker(LatLng position, String pokemonName, String pokemonNumber) {
 
         try{

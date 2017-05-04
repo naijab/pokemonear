@@ -43,6 +43,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         super();
     }
 
+
+
     public static LoginFragment newInstance() {
         LoginFragment fragment = new LoginFragment();
         Bundle args = new Bundle();
