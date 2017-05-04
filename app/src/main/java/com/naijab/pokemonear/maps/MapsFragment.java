@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -28,6 +29,7 @@ import com.naijab.pokemonear.R;
 import com.naijab.pokemonear.network.RetrofitService;
 import com.naijab.pokemonear.network.ServiceInterface;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -44,15 +46,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private Double latitudeOrigin = 37.4219877;
     private Double longitudeOrigin = -122.0840578;
+    private List<Integer> pokemonCount = new ArrayList<Integer>();
 
     private MapView mapView;
     private GoogleMap mMap;
+
     private String userEmail = "";
     private String userToken = "";
 
     private Thread thread;
     private Handler handler = new Handler();
-    BitmapDescriptor icon;
+    private BitmapDescriptor icon;
+
+    private TextView pokemonText;
 
     public MapsFragment() {
         super();
@@ -95,6 +101,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
         mapView = (MapView) rootView.findViewById(R.id.map);
+        pokemonText = (TextView) rootView.findViewById(R.id.sum_pokemon);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
 
@@ -105,6 +112,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 handler.postDelayed(this, getRandomTime());
             }
         };
+
+        showPokemonSum();
     }
 
     @Override
@@ -154,13 +163,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private void setMarker(LatLng position, String pokemonName, String pokemonNumber) {
 
-        try{
+        try {
             int id = getResources().getIdentifier("ic_pokemon_no_" + pokemonNumber,
                     "drawable", getActivity().getPackageName());
             icon = BitmapDescriptorFactory.fromResource(id);
 
-        }catch (IllegalArgumentException e){
-            Log.e("icon: ", ""+e);
+        } catch (IllegalArgumentException e) {
+            Log.e("icon: ", "" + e);
         }
 
         MarkerOptions markerOptions = new MarkerOptions();
@@ -219,6 +228,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                         for (int i = 0; i < data.size(); i++) {
 
+                            addPokemonCount(i);
                             String pokemonName = data.get(i).getName();
                             String pokemonNumber = data.get(i).getNumber();
                             double mLatitude = data.get(i).getLatitude();
@@ -228,11 +238,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                             setMarker(location, pokemonName, pokemonNumber);
 
                             Log.i("Pokemon",
-                                "id: " + data.get(i).getId() + "\n" +
-                                "name: " + data.get(i).getName() );
+                                    "id: " + data.get(i).getId() + "\n" +
+                                            "name: " + data.get(i).getName());
                         }
-                    }else{
-                        Log.i("Pokemon", "message: " + response.body().getMessage() );
+                    } else {
+                        Log.i("Pokemon", "message: " + response.body().getMessage());
                     }
                 } else {
                     showToast("Server has error.");
@@ -249,6 +259,27 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private void showToast(String text) {
         Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
+    }
+
+    private void addPokemonCount(Integer x) {
+        pokemonCount.add(x);
+    }
+
+    private int sumPokemon() {
+        int sum = 0;
+        for (int i = 1; i < pokemonCount.size(); i++)
+            sum += pokemonCount.get(i);
+        return sum;
+    }
+
+    private void setPokemonSum(int pokemonSum) {
+        if (pokemonSum != 0)
+            pokemonText.setText(String.valueOf(pokemonSum));
+    }
+
+    private void showPokemonSum(){
+        int mSumPokemon = sumPokemon();
+        setPokemonSum(mSumPokemon);
     }
 
     @Override
