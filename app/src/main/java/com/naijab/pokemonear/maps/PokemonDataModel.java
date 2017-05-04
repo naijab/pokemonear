@@ -13,15 +13,6 @@ public class PokemonDataModel {
     String number;
     String id;
 
-    public PokemonDataModel(long expiration_timestamp, double latitude, double longitude, String name, String number, String id) {
-        this.expiration_timestamp = expiration_timestamp;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.name = name;
-        this.number = number;
-        this.id = id;
-    }
-
     public long getExpiration_timestamp() {
         return expiration_timestamp;
     }

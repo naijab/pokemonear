@@ -1,44 +1,59 @@
 package com.naijab.pokemonear.maps;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.naijab.pokemonear.R;
+import com.naijab.pokemonear.network.RetrofitService;
+import com.naijab.pokemonear.network.ServiceInterface;
 
+import java.util.List;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
-    public static final int ZOOM_LEVEL_SIZE = 18;
+    public static final int ZOOM_LEVEL_SIZE = 15;
     public static final int RADIUS_METER = 2000;
-    public static final int MY_LOCATION_REQUEST_CODE = 66;
     public static final int STROKE_WIDTH = 8;
     public static final int CIRCLE_FILL_COLOR = 0x3000ff00;
 
+    private Double latitudeOrigin = 37.4219877;
+    private Double longitudeOrigin = -122.0840578;
+
     private MapView mapView;
     private GoogleMap mMap;
-    private int n;
+    private String userEmail = "";
+    private String userToken = "";
+
+    private Thread thread;
+    private Handler handler = new Handler();
 
     public MapsFragment() {
         super();
@@ -72,7 +87,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     @SuppressWarnings("UnusedParameters")
     private void init(Bundle savedInstanceState) {
-
+        SharedPreferences prefs = getActivity().getSharedPreferences("prefs_user", Context.MODE_PRIVATE);
+        userEmail = prefs.getString("email", null);
+        userToken = prefs.getString("token", null);
     }
 
 
@@ -81,70 +98,40 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mapView = (MapView) rootView.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+
+        thread = new Thread() {
+            public void run() {
+                Log.d("Thread Run", "local Thread sleeping");
+                getRandomLocation(latitudeOrigin, longitudeOrigin, RADIUS_METER);
+                handler.postDelayed(this, getRandomTime());
+            }
+        };
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        LatLng position = new LatLng(13.744728, 100.56340);
-
+        LatLng position = new LatLng(latitudeOrigin, longitudeOrigin);
         mMap = googleMap;
-
         initMapsView();
         setCircle(position, RADIUS_METER);
-        setMarker(position);
+        setMarker(position, userEmail, String.valueOf(15));
         setCamera(position, ZOOM_LEVEL_SIZE);
-
-        for (int i = 0; i < RADIUS_METER; i++) {
-            setMarker(position);
-        }
-//        Random rand = new Random();
-//        n = rand.nextInt(50000) + 2;
-//
-//        Timer time = new Timer();
-//        time.schedule(new TimerTask() {
-//            @Override
-//            public void run() {
-//                Random rand = new Random();
-//                int a = rand.nextInt(20000) + 2;
-//                getLatLngFromMyLocation(a);
-//            }
-//        }, 0, n);
-
     }
 
-    private void getLatLngFromMyLocation(final int a) {
-
-        Timer time = new Timer();
-        time.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Random rand = new Random();
-                int f = rand.nextInt(99) + 1;
-                Log.i("MapFragment", "f = " + f);
-                Log.i("MapFragment", "a = " + a);
-            }
-        }, 0, a);
+    private long getRandomTime() {
+        Random r = new Random();
+        long first = 3000;
+        long last = 4000;
+        return first + (long) (r.nextDouble() * (last - first));
     }
 
     private void initMapsView() {
-        if (ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getActivity(),
-                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            mMap.setMyLocationEnabled(false);
-        } else {
-            mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setCompassEnabled(true);
-            mMap.setContentDescription("Him is me.");
-        }
-
-        mMap.getUiSettings().setMapToolbarEnabled(true);
+        mMap.getUiSettings().setCompassEnabled(true);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.setBuildingsEnabled(false);
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-
-
     }
 
     private void setCircle(LatLng position, int RadiusMeter) {
@@ -157,12 +144,23 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.addCircle(circleOptions);
     }
 
-    private void setMarker(LatLng position) {
+    BitmapDescriptor icon;
+    private void setMarker(LatLng position, String pokemonName, String pokemonNumber) {
+
+        try{
+            int id = getResources().getIdentifier("ic_pokemon_no_" + pokemonNumber,
+                    "drawable", getActivity().getPackageName());
+            icon = BitmapDescriptorFactory.fromResource(id);
+
+        }catch (IllegalArgumentException e){
+            Log.e("icon: ", ""+e);
+        }
+
         MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-                .title("Center of World")
-//                     .snippet("I am Ultron")
-                .position(position);
+        markerOptions.title("Name: " + pokemonName)
+                .snippet("Number: " + pokemonNumber)
+                .position(position)
+                .icon(icon);
         Marker locationMarker = mMap.addMarker(markerOptions);
         locationMarker.showInfoWindow();
     }
@@ -172,7 +170,79 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.animateCamera(cameraUpdate);
     }
 
+    private void getRandomLocation(Double latitude, Double longitude, int radiusInMeters) {
 
+        double x0 = longitude;
+        double y0 = latitude;
+
+        Random random = new Random();
+
+        double radiusInDegrees = radiusInMeters / 111320f;
+
+        double u = random.nextDouble();
+        double v = random.nextDouble();
+        double w = radiusInDegrees * Math.sqrt(u);
+        double t = 2 * Math.PI * v;
+        double x = w * Math.cos(t);
+        double y = w * Math.sin(t);
+
+        double new_x = x / Math.cos(Math.toRadians(y0));
+
+        double foundLatitude;
+        double foundLongitude;
+
+        foundLatitude = y0 + y;
+        foundLongitude = x0 + new_x;
+
+        getPokemonAtNear(userToken, Double.toString(foundLatitude), Double.toString(foundLongitude));
+
+    }
+
+    private void getPokemonAtNear(String token, String latitude, String longitude) {
+        ServiceInterface apiService = RetrofitService.getRetrofit().create(ServiceInterface.class);
+        Call<PokemonCatchableModel> checkServer = apiService.getPokemon(token, latitude, longitude);
+        checkServer.enqueue(new Callback<PokemonCatchableModel>() {
+            @Override
+            public void onResponse(Call<PokemonCatchableModel> call, Response<PokemonCatchableModel> response) {
+                if (response.isSuccessful()) {
+                    if (response.body().getMessage().equals("Success")) {
+                        List<PokemonDataModel> data = response.body().getData();
+
+                        Log.i("Pokemon", "Success: " + response.body());
+
+                        for (int i = 0; i < data.size(); i++) {
+
+                            String pokemonName = data.get(i).getName();
+                            String pokemonNumber = data.get(i).getNumber();
+                            double mLatitude = data.get(i).getLatitude();
+                            double mLongitude = data.get(i).getLongitude();
+
+                            LatLng location = new LatLng(mLatitude, mLongitude);
+                            setMarker(location, pokemonName, pokemonNumber);
+
+                            Log.i("Pokemon",
+                                "id: " + data.get(i).getId() + "\n" +
+                                "name: " + data.get(i).getName() );
+                        }
+                    }else{
+                        Log.i("Pokemon", "message: " + response.body().getMessage() );
+                    }
+                } else {
+                    showToast("Server has error.");
+                    Log.i("Login fail", "Server has error");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PokemonCatchableModel> call, Throwable t) {
+                showToast("Sorry service has error: " + t);
+            }
+        });
+    }
+
+    private void showToast(String text) {
+        Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -189,12 +259,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     public void onResume() {
         super.onResume();
         mapView.onResume();
+
+        handler.removeCallbacks(thread);
+        handler.postDelayed(thread, 0);
+        Log.d("Thread Run", "onResume");
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mapView.onPause();
+
+        handler.removeCallbacks(thread);
+        Log.d("Thread Run", "onPause");
     }
 
     @Override

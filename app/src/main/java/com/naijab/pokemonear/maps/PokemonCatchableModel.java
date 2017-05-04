@@ -10,11 +10,6 @@ public class PokemonCatchableModel {
     private String message;
     private List<PokemonDataModel> data;
 
-    public PokemonCatchableModel(String message, List<PokemonDataModel> data) {
-        this.message = message;
-        this.data = data;
-    }
-
     public String getMessage() {
         return message;
     }
