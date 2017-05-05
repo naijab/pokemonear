@@ -236,10 +236,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         Log.i("Pokemon", "Success: " + response.body());
 
                         int pokemonInt = data.size();
-
+                        showPokemonSum(pokemonInt);
                         for (int i = 0; i < data.size(); i++) {
-
-                            showPokemonSum(pokemonInt);
                             String pokemonName = data.get(i).getName();
                             String pokemonNumber = data.get(i).getNumber();
                             double mLatitude = data.get(i).getLatitude();
