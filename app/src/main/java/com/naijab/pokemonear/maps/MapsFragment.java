@@ -220,7 +220,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         foundLongitude = x0 + new_x;
 
         getPokemonAtNear(userToken, Double.toString(foundLatitude), Double.toString(foundLongitude));
-
     }
 
     private void getPokemonAtNear(String token, String latitude, String longitude) {
@@ -248,6 +247,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                             LatLng location = new LatLng(mLatitude, mLongitude);
                             setMarker(location, pokemonName, pokemonNumber);
+                            setCamera(location, ZOOM_LEVEL_SIZE);
 
                             Log.i("Pokemon",
                                     "id: " + data.get(i).getId() + "\n" +
