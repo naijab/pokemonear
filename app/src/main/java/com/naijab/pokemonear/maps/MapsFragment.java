@@ -28,6 +28,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.naijab.pokemonear.R;
 import com.naijab.pokemonear.network.RetrofitService;
 import com.naijab.pokemonear.network.ServiceInterface;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private BitmapDescriptor icon;
 
     private TextView pokemonText;
+    private SlidingUpPanelLayout slidingLayout;
 
     public MapsFragment() {
         super();
@@ -100,10 +102,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
-        mapView = (MapView) rootView.findViewById(R.id.map);
-        pokemonText = (TextView) rootView.findViewById(R.id.sum_pokemon);
+
+        bindView(rootView);
+
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+
+        slidingLayout.addPanelSlideListener(onSlideListener());
 
         thread = new Thread() {
             public void run() {
@@ -112,8 +117,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 handler.postDelayed(this, getRandomTime());
             }
         };
+    }
 
-        showPokemonSum();
+    private void bindView(View rootView) {
+        mapView = (MapView) rootView.findViewById(R.id.map);
+        pokemonText = (TextView) rootView.findViewById(R.id.sum_pokemon);
+        slidingLayout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
     }
 
     @Override
@@ -124,6 +133,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         setCircle(position, RADIUS_METER);
         setMarkerCenter(position, userEmail);
         setCamera(position, ZOOM_LEVEL_SIZE);
+        showPokemonSum();
     }
 
     private void setMarkerCenter(LatLng position, String userEmail) {
@@ -145,7 +155,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.getUiSettings().setMyLocationButtonEnabled(true);
-        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(false);
         mMap.setBuildingsEnabled(false);
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
     }
@@ -222,6 +232,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             public void onResponse(Call<PokemonCatchableModel> call, Response<PokemonCatchableModel> response) {
                 if (response.isSuccessful()) {
                     if (response.body().getMessage().equals("Success")) {
+
                         List<PokemonDataModel> data = response.body().getData();
 
                         Log.i("Pokemon", "Success: " + response.body());
@@ -229,6 +240,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         for (int i = 0; i < data.size(); i++) {
 
                             addPokemonCount(i);
+                            showPokemonSum();
                             String pokemonName = data.get(i).getName();
                             String pokemonNumber = data.get(i).getNumber();
                             double mLatitude = data.get(i).getLatitude();
@@ -267,8 +279,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private int sumPokemon() {
         int sum = 0;
-        for (int i = 1; i < pokemonCount.size(); i++)
+        for (int i = 0; i < pokemonCount.size(); i++)
             sum += pokemonCount.get(i);
+
+        Log.i("Pokemon count", "data: " + sum);
         return sum;
     }
 
@@ -277,9 +291,26 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             pokemonText.setText(String.valueOf(pokemonSum));
     }
 
-    private void showPokemonSum(){
+    private void showPokemonSum() {
         int mSumPokemon = sumPokemon();
         setPokemonSum(mSumPokemon);
+    }
+
+    private SlidingUpPanelLayout.PanelSlideListener onSlideListener() {
+        return new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View view, float v) {
+
+            }
+
+            @Override
+            public void onPanelStateChanged(View panel,
+                                            SlidingUpPanelLayout.PanelState previousState,
+                                            SlidingUpPanelLayout.PanelState newState) {
+
+            }
+
+        };
     }
 
     @Override
