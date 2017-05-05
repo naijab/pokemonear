@@ -8,10 +8,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="bottom"
-        sothree:umanoDragView="@+id/dragView"
+        sothree:umanoDragView="@+id/drag_view"
         sothree:umanoOverlay="true"
         sothree:umanoPanelHeight="@dimen/xxx_large_even"
-        sothree:umanoParalaxOffset="@dimen/very_xxx_large"
+        sothree:umanoParallaxOffset="@dimen/very_super_large"
         sothree:umanoShadowHeight="@dimen/small_even">
 
         <LinearLayout
@@ -30,6 +30,7 @@
             android:id="@+id/drag_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#ffffff"
             android:clickable="true"
             android:focusable="false"
             android:orientation="vertical">

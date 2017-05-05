@@ -12,6 +12,9 @@
     <dimen name="large_even">8dp</dimen>
     <dimen name="x_large_even">16dp</dimen>
     <dimen name="xx_large_even">32dp</dimen>
+    <dimen name="xxx_large_even">64dp</dimen>
+
+    <dimen name="very_super_large">100dp</dimen>
 
     <dimen name="margin_screen">@dimen/x_large_even</dimen>
 

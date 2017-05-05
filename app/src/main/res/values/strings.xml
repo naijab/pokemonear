@@ -12,6 +12,7 @@
     <string name="server_active">Server Active</string>
     <string name="server_deactivate">Server Deactivate</string>
     <string name="title_activity_maps">Map</string>
+    <string name="pokemon_count">Pokemon Count: </string>
 
     <string name="google_map_key">AIzaSyBPZLcLcDuvf78LZP9DXC6RajjL29vtOTg</string>
 
