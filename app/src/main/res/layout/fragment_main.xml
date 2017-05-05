@@ -1,53 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <ScrollView
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:sothree="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:gravity="bottom"
+        sothree:umanoDragView="@+id/dragView"
+        sothree:umanoOverlay="true"
+        sothree:umanoPanelHeight="@dimen/xxx_large_even"
+        sothree:umanoParalaxOffset="@dimen/very_xxx_large"
+        sothree:umanoShadowHeight="@dimen/small_even">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
             <com.google.android.gms.maps.MapView
                 android:id="@+id/map"
                 android:layout_width="match_parent"
-                android:layout_height="400dp" />
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/drag_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true"
+            android:focusable="false"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="20dp">
+                android:padding="@dimen/x_large_even">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="จำนวน Pokemon: "
+                    android:text="@string/pokemon_count"
                     android:textAlignment="center"
-                    android:textSize="18sp" />
+                    android:textSize="@dimen/text_x_size" />
 
                 <TextView
+                    android:id="@+id/sum_pokemon"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="555"
+                    android:text=""
                     android:textAlignment="center"
-                    android:textSize="20sp"
+                    android:textSize="@dimen/text_x_size"
                     android:textStyle="bold" />
-
 
             </LinearLayout>
 
-
         </LinearLayout>
-    </ScrollView>
 
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
-</LinearLayout>
+</RelativeLayout>
