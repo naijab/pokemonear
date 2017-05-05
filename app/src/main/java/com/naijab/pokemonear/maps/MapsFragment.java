@@ -47,7 +47,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     private Double latitudeOrigin = 37.4219877;
     private Double longitudeOrigin = -122.0840578;
-    private List<Integer> pokemonCount = new ArrayList<Integer>();
+    private ArrayList<Integer> pokemonCount = new ArrayList<>();
 
     private MapView mapView;
     private GoogleMap mMap;
@@ -133,7 +133,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         setCircle(position, RADIUS_METER);
         setMarkerCenter(position, userEmail);
         setCamera(position, ZOOM_LEVEL_SIZE);
-        showPokemonSum();
     }
 
     private void setMarkerCenter(LatLng position, String userEmail) {
@@ -237,10 +236,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
                         Log.i("Pokemon", "Success: " + response.body());
 
+                        int pokemonInt = data.size();
+
                         for (int i = 0; i < data.size(); i++) {
 
-                            addPokemonCount(i);
-                            showPokemonSum();
+                            showPokemonSum(pokemonInt);
                             String pokemonName = data.get(i).getName();
                             String pokemonNumber = data.get(i).getNumber();
                             double mLatitude = data.get(i).getLatitude();
@@ -273,27 +273,20 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
     }
 
-    private void addPokemonCount(Integer x) {
+    private void showPokemonSum(int x) {
         pokemonCount.add(x);
-    }
-
-    private int sumPokemon() {
         int sum = 0;
         for (int i = 0; i < pokemonCount.size(); i++)
             sum += pokemonCount.get(i);
 
         Log.i("Pokemon count", "data: " + sum);
-        return sum;
+
+        setPokemonSum(sum);
     }
 
     private void setPokemonSum(int pokemonSum) {
         if (pokemonSum != 0)
             pokemonText.setText(String.valueOf(pokemonSum));
-    }
-
-    private void showPokemonSum() {
-        int mSumPokemon = sumPokemon();
-        setPokemonSum(mSumPokemon);
     }
 
     private SlidingUpPanelLayout.PanelSlideListener onSlideListener() {
