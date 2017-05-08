@@ -248,16 +248,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
               long pokemonLifeTime = data.get(i).getExpiration_timestamp();
               double mLatitude = data.get(i).getLatitude();
               double mLongitude = data.get(i).getLongitude();
-
               LatLng location = new LatLng(mLatitude, mLongitude);
 
-              setMarker(location, pokemonName, pokemonNumber, pokemonID);
-              setCamera(location, ZOOM_LEVEL_SIZE);
-              removeMarker(pokemonID, pokemonLifeTime);
+              targetMarker = hashMapMarker.get(pokemonID);
+
+              if (targetMarker == null) {
+                setMarker(location, pokemonName, pokemonNumber, pokemonID);
+                removeMarker(pokemonID, pokemonLifeTime);
+                setCamera(location, ZOOM_LEVEL_SIZE);
+              }else {
+                removeMarker(pokemonID, pokemonLifeTime);
+              }
 
               Log.i("Pokemon",
-                  "id: " + data.get(i).getId() + "\n" +
-                      "name: " + data.get(i).getName());
+                    "id: " + data.get(i).getId() + "\n" +
+                    "name: " + data.get(i).getName());
+
             }
           } else {
             Log.i("Pokemon", "message: " + response.body().getMessage());
@@ -299,11 +305,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
   private void removeMarker(String pokemonID, long pokemonLifeTime){
 
-    long LifeTime = pokemonLifeTime;
-    long ThisTime = System.currentTimeMillis();
-
-    int minutesLifeTime = (int) ((LifeTime / (1000*60)) % 60);
-//    int minutesThisTime = (int) ((ThisTime / (1000*60)) % 60);
+    final String pokemonInID = pokemonID;
+    final long LifeTime = pokemonLifeTime;
+    final long minutesLifeTime = (int) ((LifeTime / 10000000));
 
     targetMarker = hashMapMarker.get(pokemonID);
 
@@ -311,12 +315,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
       countDownTimer = new CountDownTimer(minutesLifeTime, 1000) {
         @Override
         public void onTick(long millisUntilFinished) {
-
+          Log.i("PokemonLife", "Has life : "+ pokemonInID + "\n" +
+                               "Life is:" + minutesLifeTime);
         }
 
         @Override
         public void onFinish() {
           targetMarker.remove();
+          Log.i("PokemonLife", "" + pokemonInID +" Has Die 555+");
+          LatLng position = new LatLng(latitudeOrigin, longitudeOrigin);
+          setCamera(position, ZOOM_LEVEL_SIZE);
         }
       }.start();
     }
