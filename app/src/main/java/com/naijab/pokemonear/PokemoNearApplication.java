@@ -1,6 +1,7 @@
 package com.naijab.pokemonear;
 
 import android.app.Application;
+import com.naijab.pokemonear.utility.Contextor;
 
 /**
  * Created by Xiltron on 26/4/2560.
@@ -8,18 +9,18 @@ import android.app.Application;
 
 public class PokemoNearApplication extends Application {
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        init();
-    }
+  @Override
+  public void onCreate() {
+    super.onCreate();
+    init();
+  }
 
-    private void init() {
-        //TODO: init Application
-    }
+  private void init() {
+    Contextor.init(getApplicationContext());
+  }
 
-    @Override
-    public void onTerminate() {
-        super.onTerminate();
-    }
+  @Override
+  public void onTerminate() {
+    super.onTerminate();
+  }
 }
