@@ -10,12 +10,15 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.naijab.pokemonear.R;
+import com.naijab.pokemonear.login.manager.UserLoginManager;
+import com.naijab.pokemonear.login.manager.UserLoginManager.UserLoginManagerCallBack;
 import com.naijab.pokemonear.maps.MapsActivity;
 import com.naijab.pokemonear.network.PokemonServerConnect;
 import com.naijab.pokemonear.network.PokemonServerManager;
@@ -25,13 +28,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LoginFragment extends Fragment implements View.OnClickListener {
+public class LoginFragment extends Fragment {
 
   private Button btnLogin;
   private EditText editUsername;
   private EditText editPassword;
-  private Boolean serverStatus = false;
-  private Boolean loginStatus = false;
   private final String TAG = getClass().getSimpleName();
 
   public LoginFragment() {
@@ -61,8 +62,6 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
       Bundle savedInstanceState) {
     View rootView = inflater.inflate(R.layout.fragment_login, container, false);
     initInstances(rootView, savedInstanceState);
-    checkServer();
-
     return rootView;
   }
 
@@ -77,36 +76,17 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     btnLogin = (Button) rootView.findViewById(R.id.btn_login);
     editUsername = (EditText) rootView.findViewById(R.id.edit_email);
     editPassword = (EditText) rootView.findViewById(R.id.edit_password);
-    btnLogin.setOnClickListener(this);
-    serverStatus = false;
-    loginStatus = false;
-
-    int id = getResources().getIdentifier("ic_pokemon_no_" + 2,
-        "drawable", getActivity().getPackageName());
-    Log.i("Drawable", "" + id);
+    btnLogin.setOnClickListener(onLoginListener);
   }
 
+  private View.OnClickListener onLoginListener = new View.OnClickListener(){
+    @Override
+    public void onClick(View v) {
+      checkServer();
+    }
+  };
 
-  private void checkServer() {
-    PokemonServerManager.getInstance().CheckServerStatus(new CheckServerStatusCallBack() {
-      @Override
-      public void onServerActive(String ServerStatus) {
-        showToast(ServerStatus);
-      }
-
-      @Override
-      public void onServerDown(String ServerStatus) {
-        showToast(ServerStatus);
-      }
-
-      @Override
-      public void onServerError(String ServerError) {
-        showToast(ServerError);
-      }
-    });
-  }
-
-  public void initViewForm() {
+  public void initViewFormLogin() {
     String email = editUsername.getText().toString();
     String password = editPassword.getText().toString();
 
@@ -121,63 +101,62 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     checkLogin(email, password);
   }
 
-  private void checkLogin(String email, String password) {
-
-    PokemonServerService apiService = PokemonServerConnect.getRetrofit()
-        .create(PokemonServerService.class);
-    Call<UserLoginModel> checkServer = apiService.getUserLogin(email, password);
-    checkServer.enqueue(new Callback<UserLoginModel>() {
+  private void checkServer() {
+    PokemonServerManager.getInstance().CheckServerStatus(new CheckServerStatusCallBack() {
       @Override
-      public void onResponse(Call<UserLoginModel> call, Response<UserLoginModel> response) {
-        if (response.isSuccessful()) {
-          if (response.body().getMessage().equals("Login Successful")) {
-            hideKeyboard();
-            String token = response.body().getToken();
-            String email = editUsername.getText().toString();
-
-            boolean isSaveUser = mManager.saveUser(token, email);
-            if (isSaveUser) {
-              showToast("Login Successful:" + token);
-              loginStatus = true;
-              goMapsActivity();
-            } else {
-              showToast("Can't Save Successful:" + token);
-            }
-          } else {
-            showToast(getResources().getString(R.string.login_error));
-            loginStatus = false;
-          }
-        } else {
-          showToast("Server has error.");
-          Log.i("Login fail", "");
-        }
+      public void onServerActive(String ServerStatus) {
+        showToast(ServerStatus);
+        initViewFormLogin();
       }
 
       @Override
-      public void onFailure(Call<UserLoginModel> call, Throwable t) {
-        showToast("Sorry service has error: " + t);
+      public void onServerDown(String ServerStatus) {
+        showToast(ServerStatus);
+      }
+
+      @Override
+      public void onServerError(String ServerError) {
+        showToast(ServerError);
       }
     });
+  }
+
+  private void checkLogin(String username, String password) {
+    UserLoginManager.getInstance().CheckUserLogin(username, password,
+        new UserLoginManagerCallBack() {
+          @Override
+          public void onUserLoginSuccess() {
+            showToast("Login Success");
+            hideKeyboard();
+            goMapsActivity();
+          }
+
+          @Override
+          public void onUserLoginUnableSave() {
+            showToast("Can't save user.");
+          }
+
+          @Override
+          public void onUserLoginInvalid() {
+            showToast("Email or Password invalid.");
+          }
+
+          @Override
+          public void onUserLoginFail() {
+            showToast("Login has error.");
+          }
+
+          @Override
+          public void onUserLoginError(String errorMassage) {
+            showToast(errorMassage);
+          }
+        });
   }
 
   private void goMapsActivity() {
     Intent i = new Intent(getActivity(), MapsActivity.class);
     startActivity(i);
-  }
-
-  private Boolean checkForm() {
-
-    if (editUsername != null && editPassword != null) {
-      return true;
-    }
-
-    return false;
-  }
-
-  private void tryToLogin() {
-    if (!loginStatus) {
-      initViewForm();
-    }
+    getActivity().finish();
   }
 
   private void showToast(String text) {
@@ -208,27 +187,5 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
   @Override
   public void onDestroyView() {
     super.onDestroyView();
-    loginStatus = false;
   }
-
-  @Override
-  public void onClick(View v) {
-
-    if (v == btnLogin) {
-      if (checkForm()) {
-        if (serverStatus) {
-          tryToLogin();
-        } else {
-          showToast(serverStatusMessage);
-        }
-
-      } else {
-        showToast("Please fill email and password.");
-      }
-
-    }
-
-  }
-
-
 }
