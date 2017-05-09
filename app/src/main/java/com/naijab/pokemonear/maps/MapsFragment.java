@@ -26,8 +26,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.naijab.pokemonear.R;
-import com.naijab.pokemonear.network.RetrofitService;
-import com.naijab.pokemonear.network.ServiceInterface;
+import com.naijab.pokemonear.network.PokemonServerConnect;
+import com.naijab.pokemonear.network.PokemonServerService;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -220,66 +220,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     foundLatitude = y0 + y;
     foundLongitude = x0 + new_x;
 
-    getPokemonAtNear(userToken, Double.toString(foundLatitude), Double.toString(foundLongitude));
+//    getPokemonAtNear(userToken, Double.toString(foundLatitude), Double.toString(foundLongitude));
   }
 
-  private void getPokemonAtNear(String token, String latitude, String longitude) {
-    ServiceInterface apiService = RetrofitService.getRetrofit().create(ServiceInterface.class);
-    Call<PokemonCatchableModel> checkServer = apiService.getPokemon(token, latitude, longitude);
-    checkServer.enqueue(new Callback<PokemonCatchableModel>() {
-      @Override
-      public void onResponse(Call<PokemonCatchableModel> call,
-          Response<PokemonCatchableModel> response) {
-        if (response.isSuccessful()) {
-          if (response.body().getMessage().equals("Success")) {
-
-            List<PokemonDataModel> data = response.body().getData();
-
-            Log.i("Pokemon", "Success: " + response.body());
-
-            int pokemonInt = data.size();
-            showPokemonSum(pokemonInt);
-
-            for (int i = 0; i < data.size(); i++) {
-
-              String pokemonName = data.get(i).getName();
-              String pokemonNumber = data.get(i).getNumber();
-              String pokemonID = data.get(i).getId();
-              long pokemonLifeTime = data.get(i).getExpiration_timestamp();
-              double mLatitude = data.get(i).getLatitude();
-              double mLongitude = data.get(i).getLongitude();
-              LatLng location = new LatLng(mLatitude, mLongitude);
-
-              targetMarker = hashMapMarker.get(pokemonID);
-
-              if (targetMarker == null) {
-                setMarker(location, pokemonName, pokemonNumber, pokemonID);
-                removeMarker(pokemonID, pokemonLifeTime);
-                setCamera(location, ZOOM_LEVEL_SIZE);
-              }else {
-                removeMarker(pokemonID, pokemonLifeTime);
-              }
-
-              Log.i("Pokemon",
-                    "id: " + data.get(i).getId() + "\n" +
-                    "name: " + data.get(i).getName());
-
-            }
-          } else {
-            Log.i("Pokemon", "message: " + response.body().getMessage());
-          }
-        } else {
-          showToast("Server has error.");
-          Log.i("Login fail", "Server has error");
-        }
-      }
-
-      @Override
-      public void onFailure(Call<PokemonCatchableModel> call, Throwable t) {
-        showToast("Sorry service has error: " + t);
-      }
-    });
-  }
 
   private void showToast(String text) {
     Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
