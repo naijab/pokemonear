@@ -16,7 +16,7 @@ public class PokemonServerManager {
     return pokemonServerManager;
   }
 
-  public void CheckServerStatus(final CheckServerStatusCallBack callBack) {
+  public void checkServerStatus(final CheckServerStatusCallBack callBack) {
     PokemonServerConnect.getInstance().getConnection().getServerStatus().enqueue(
         new Callback<ServerStatusModel>() {
           @Override
@@ -41,7 +41,7 @@ public class PokemonServerManager {
 
           @Override
           public void onFailure(Call<ServerStatusModel> call, Throwable t) {
-            callBack.onServerError(t.toString());
+            callBack.onServerError(t.getMessage());
           }
         });
   }
