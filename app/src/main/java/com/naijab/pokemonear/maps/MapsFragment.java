@@ -142,25 +142,25 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
   private void findPokemon( String token,
                             String latitude,
                             String longitude) {
-    PokemonManager.getInstance().findPokemon( token,
-                                              latitude,
-                                              longitude,
-                                              new FindPokemonCallBack() {
-      @Override
-      public void onDetectPokemon() {
+    PokemonManager.getInstance().findRandomPokemon(token,
+        latitude,
+        longitude,
+        new FindPokemonCallBack() {
+          @Override
+          public void onDetectPokemon(ArrayList pokemonList) {
+            Log.i("MapsFragment",""+pokemonList.size());
+          }
 
-      }
+          @Override
+          public void onDetectPokemonFail(String message) {
+            showToast(message);
+          }
 
-      @Override
-      public void onDetectPokemonFail() {
-
-      }
-
-      @Override
-      public void onServerError(String errorMassage) {
-        showToast(errorMassage);
-      }
-    });
+          @Override
+          public void onServerError(String errorMassage) {
+            showToast(errorMassage);
+          }
+        });
 
   }
 
