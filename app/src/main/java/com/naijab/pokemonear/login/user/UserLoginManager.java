@@ -1,13 +1,9 @@
-package com.naijab.pokemonear.login.manager;
+package com.naijab.pokemonear.login.user;
 
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
-import com.naijab.pokemonear.R;
-import com.naijab.pokemonear.login.UserLoginModel;
 import com.naijab.pokemonear.network.PokemonServerConnect;
-import com.naijab.pokemonear.utility.Contextor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -38,7 +34,10 @@ public class UserLoginManager {
     return mEditor.commit();
   }
 
-  public void CheckUserLogin(final String username, String password,
+  public void CheckUserLogin(
+      final Context context,
+      final String username,
+      final String password,
       final UserLoginManagerCallBack callBack) {
 
     PokemonServerConnect.getInstance().getConnection().getUserLogin(username, password).enqueue(
@@ -50,7 +49,7 @@ public class UserLoginManager {
               if (response.body().getMessage().equals("Login Successful")) {
                 hideKeyboard();
                 String token = response.body().getToken();
-                boolean isSaveUser = saveUser(token, username, Contextor.getContext());
+                boolean isSaveUser = saveUser(token, username, context);
 
                 if (isSaveUser) {
                   callBack.onUserLoginSuccess();
