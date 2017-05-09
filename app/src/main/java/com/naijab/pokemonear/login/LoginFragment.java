@@ -10,23 +10,17 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.naijab.pokemonear.R;
-import com.naijab.pokemonear.login.manager.UserLoginManager;
-import com.naijab.pokemonear.login.manager.UserLoginManager.UserLoginManagerCallBack;
+import com.naijab.pokemonear.login.user.UserLoginManager;
+import com.naijab.pokemonear.login.user.UserLoginManager.UserLoginManagerCallBack;
 import com.naijab.pokemonear.maps.MapsActivity;
-import com.naijab.pokemonear.network.PokemonServerConnect;
 import com.naijab.pokemonear.network.PokemonServerManager;
 import com.naijab.pokemonear.network.PokemonServerManager.CheckServerStatusCallBack;
-import com.naijab.pokemonear.network.PokemonServerService;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class LoginFragment extends Fragment {
 
@@ -79,7 +73,7 @@ public class LoginFragment extends Fragment {
     btnLogin.setOnClickListener(onLoginListener);
   }
 
-  private View.OnClickListener onLoginListener = new View.OnClickListener(){
+  private View.OnClickListener onLoginListener = new View.OnClickListener() {
     @Override
     public void onClick(View v) {
       checkServer();
@@ -102,7 +96,7 @@ public class LoginFragment extends Fragment {
   }
 
   private void checkServer() {
-    PokemonServerManager.getInstance().CheckServerStatus(new CheckServerStatusCallBack() {
+    PokemonServerManager.getInstance().checkServerStatus(new CheckServerStatusCallBack() {
       @Override
       public void onServerActive(String ServerStatus) {
         showToast(ServerStatus);
@@ -122,7 +116,7 @@ public class LoginFragment extends Fragment {
   }
 
   private void checkLogin(String username, String password) {
-    UserLoginManager.getInstance().CheckUserLogin(username, password,
+    UserLoginManager.getInstance().CheckUserLogin(getActivity(), username, password,
         new UserLoginManagerCallBack() {
           @Override
           public void onUserLoginSuccess() {
@@ -156,7 +150,6 @@ public class LoginFragment extends Fragment {
   private void goMapsActivity() {
     Intent i = new Intent(getActivity(), MapsActivity.class);
     startActivity(i);
-    getActivity().finish();
   }
 
   private void showToast(String text) {
