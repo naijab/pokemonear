@@ -26,16 +26,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.naijab.pokemonear.R;
-import com.naijab.pokemonear.network.PokemonServerConnect;
-import com.naijab.pokemonear.network.PokemonServerService;
+import com.naijab.pokemonear.maps.pokemon.PokemonManager;
+import com.naijab.pokemonear.maps.pokemon.PokemonManager.FindPokemonCallBack;
+import com.naijab.pokemonear.utility.RandomUtility;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 import java.util.WeakHashMap;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
@@ -48,6 +44,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
   private Double longitudeOrigin = -122.0840578;
   private ArrayList<Integer> pokemonCount = new ArrayList<>();
   private WeakHashMap<String, Marker> hashMapMarker = new WeakHashMap<>();
+
+  private long randomTime;
+  private LatLng randomLocation;
+  private double randomLatitude;
+  private double randomLongitude;
 
   private MapView mapView;
   private GoogleMap mMap;
@@ -111,21 +112,56 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
 
+    randomTime = new RandomUtility().getInstance().getTime(3000, 4000);
+
     slidingLayout.addPanelSlideListener(onSlideListener());
 
     thread = new Thread() {
       public void run() {
         Log.d("Thread Run", "local Thread sleeping");
-        getRandomLocation(latitudeOrigin, longitudeOrigin, RADIUS_METER);
-        handler.postDelayed(this, getRandomTime());
+        getRandomPokemon();
+        handler.postDelayed(this, randomTime);
       }
     };
+  }
+
+  private void getRandomPokemon() {
+    randomLocation = new RandomUtility().getInstance()
+        .getLocation(latitudeOrigin, longitudeOrigin, RADIUS_METER);
+    randomLatitude = randomLocation.latitude;
+    randomLongitude = randomLocation.longitude;
+    findPokemon(userToken, String.valueOf(randomLatitude), String.valueOf(randomLongitude));
   }
 
   private void bindView(View rootView) {
     mapView = (MapView) rootView.findViewById(R.id.map);
     pokemonText = (TextView) rootView.findViewById(R.id.sum_pokemon);
     slidingLayout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
+  }
+
+  private void findPokemon( String token,
+                            String latitude,
+                            String longitude) {
+    PokemonManager.getInstance().findPokemon( token,
+                                              latitude,
+                                              longitude,
+                                              new FindPokemonCallBack() {
+      @Override
+      public void onDetectPokemon() {
+
+      }
+
+      @Override
+      public void onDetectPokemonFail() {
+
+      }
+
+      @Override
+      public void onServerError(String errorMassage) {
+        showToast(errorMassage);
+      }
+    });
+
   }
 
   @Override
@@ -136,6 +172,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     setCircle(position, RADIUS_METER);
     setMarkerCenter(position, userEmail);
     setCamera(position, ZOOM_LEVEL_SIZE);
+    randomLocation = new RandomUtility().getInstance()
+        .getLocation(latitudeOrigin, longitudeOrigin, RADIUS_METER);
+
   }
 
   private void setMarkerCenter(LatLng position, String userEmail) {
@@ -144,13 +183,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         .position(position);
     Marker locationMarker = mMap.addMarker(markerOptions);
     locationMarker.showInfoWindow();
-  }
-
-  private long getRandomTime() {
-    Random r = new Random();
-    long first = 3000;
-    long last = 4000;
-    return first + (long) (r.nextDouble() * (last - first));
   }
 
   private void initMapsView() {
@@ -172,7 +204,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     mMap.addCircle(circleOptions);
   }
 
-  private void setMarker(LatLng position, String pokemonName, String pokemonNumber, String pokemonID) {
+  private void setMarker(LatLng position, String pokemonName, String pokemonNumber,
+      String pokemonID) {
 
     try {
       int id = getResources().getIdentifier("ic_pokemon_no_" + pokemonNumber,
@@ -194,33 +227,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
   private void setCamera(LatLng position, int ZoomLevelSize) {
     CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom((position), ZoomLevelSize);
     mMap.animateCamera(cameraUpdate);
-  }
-
-  private void getRandomLocation(Double latitude, Double longitude, int radiusInMeters) {
-
-    double x0 = longitude;
-    double y0 = latitude;
-
-    Random random = new Random();
-
-    double radiusInDegrees = radiusInMeters / 111320f;
-
-    double u = random.nextDouble();
-    double v = random.nextDouble();
-    double w = radiusInDegrees * Math.sqrt(u);
-    double t = 2 * Math.PI * v;
-    double x = w * Math.cos(t);
-    double y = w * Math.sin(t);
-
-    double new_x = x / Math.cos(Math.toRadians(y0));
-
-    double foundLatitude;
-    double foundLongitude;
-
-    foundLatitude = y0 + y;
-    foundLongitude = x0 + new_x;
-
-//    getPokemonAtNear(userToken, Double.toString(foundLatitude), Double.toString(foundLongitude));
   }
 
 
@@ -246,7 +252,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     }
   }
 
-  private void removeMarker(String pokemonID, long pokemonLifeTime){
+  private void removeMarker(String pokemonID, long pokemonLifeTime) {
 
     final String pokemonInID = pokemonID;
     final long LifeTime = pokemonLifeTime;
@@ -254,18 +260,18 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     targetMarker = hashMapMarker.get(pokemonID);
 
-    if(targetMarker!=null){
+    if (targetMarker != null) {
       countDownTimer = new CountDownTimer(minutesLifeTime, 1000) {
         @Override
         public void onTick(long millisUntilFinished) {
-          Log.i("PokemonLife", "Has life : "+ pokemonInID + "\n" +
-                               "Life is:" + minutesLifeTime);
+          Log.i("PokemonLife", "Has life : " + pokemonInID + "\n" +
+              "Life is:" + minutesLifeTime);
         }
 
         @Override
         public void onFinish() {
           targetMarker.remove();
-          Log.i("PokemonLife", "" + pokemonInID +" Has Die 555+");
+          Log.i("PokemonLife", "" + pokemonInID + " Has Die 555+");
           LatLng position = new LatLng(latitudeOrigin, longitudeOrigin);
           setCamera(position, ZOOM_LEVEL_SIZE);
         }
