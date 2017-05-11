@@ -19,8 +19,6 @@ public class PokemonManager {
     return pokemonManager;
   }
 
-  private ArrayList<List<PokemonDataModel>> pokemonDataList;
-
   public void findRandomPokemon(String token,
       String latitude,
       String longitude,
