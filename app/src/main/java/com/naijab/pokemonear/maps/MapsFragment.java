@@ -31,7 +31,7 @@ import com.naijab.pokemonear.maps.pokemon.PokemonManager.FindPokemonCallBack;
 import com.naijab.pokemonear.utility.RandomUtility;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import java.util.ArrayList;
-import java.util.WeakHashMap;
+import java.util.HashMap;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
@@ -43,7 +43,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
   private Double latitudeOrigin = 37.4219877;
   private Double longitudeOrigin = -122.0840578;
   private ArrayList<Integer> pokemonCount = new ArrayList<>();
-  private WeakHashMap<String, Marker> hashMapMarker = new WeakHashMap<>();
+  private HashMap<String, Marker> hashMapMarker = new HashMap<>();
 
   private long randomTime;
   private LatLng randomLocation;
@@ -112,7 +112,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(this);
 
-    randomTime = new RandomUtility().getInstance().getTime(3000, 4000);
+    randomTime = RandomUtility.getInstance().getTime(3000, 4000);
 
     slidingLayout.addPanelSlideListener(onSlideListener());
 
@@ -139,16 +139,25 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     slidingLayout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
   }
 
-  private void findPokemon( String token,
-                            String latitude,
-                            String longitude) {
+  private void findPokemon(String token,
+      String latitude,
+      String longitude) {
     PokemonManager.getInstance().findRandomPokemon(token,
         latitude,
         longitude,
         new FindPokemonCallBack() {
           @Override
-          public void onDetectPokemon(ArrayList pokemonList) {
-            Log.i("MapsFragment",""+pokemonList.size());
+          public void onDetectPokemon(String pokemonID, String pokemonName, String pokemonNumber,
+              double pokemonLatitude, double pokemonLongitude, long pokemonLife, int pokemonCount) {
+            LatLng pokemonLocation = new LatLng(pokemonLatitude, pokemonLongitude);
+            setMarker(pokemonLocation,
+                pokemonName,
+                pokemonNumber,
+                pokemonID,
+                pokemonLife);
+            setCamera(pokemonLocation, ZOOM_LEVEL_SIZE);
+            showPokemonSum(pokemonCount);
+
           }
 
           @Override
@@ -172,7 +181,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     setCircle(position, RADIUS_METER);
     setMarkerCenter(position, userEmail);
     setCamera(position, ZOOM_LEVEL_SIZE);
-    randomLocation = new RandomUtility().getInstance()
+    randomLocation = RandomUtility.getInstance()
         .getLocation(latitudeOrigin, longitudeOrigin, RADIUS_METER);
 
   }
@@ -205,7 +214,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
   }
 
   private void setMarker(LatLng position, String pokemonName, String pokemonNumber,
-      String pokemonID) {
+      String pokemonID, long pokemonLife) {
 
     try {
       int id = getResources().getIdentifier("ic_pokemon_no_" + pokemonNumber,
@@ -222,6 +231,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     Marker locationMarker = mMap.addMarker(markerOptions);
     hashMapMarker.put(pokemonID, locationMarker);
     locationMarker.showInfoWindow();
+    removeMarker(pokemonID, pokemonName, pokemonNumber, pokemonLife);
   }
 
   private void setCamera(LatLng position, int ZoomLevelSize) {
@@ -252,9 +262,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     }
   }
 
-  private void removeMarker(String pokemonID, long pokemonLifeTime) {
+  private void removeMarker(final String pokemonID,
+      final String pokemonName,
+      final String pokemonNumber,
+      final long pokemonLifeTime) {
 
-    final String pokemonInID = pokemonID;
     final long LifeTime = pokemonLifeTime;
     final long minutesLifeTime = (int) ((LifeTime / 10000000));
 
@@ -264,14 +276,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
       countDownTimer = new CountDownTimer(minutesLifeTime, 1000) {
         @Override
         public void onTick(long millisUntilFinished) {
-          Log.i("PokemonLife", "Has life : " + pokemonInID + "\n" +
-              "Life is:" + minutesLifeTime);
+          Log.i("PokemonLife", "Has life : " + pokemonID + "\n" +
+              "Name: " + pokemonName+"\n"+
+              "Number: " + pokemonNumber+"\n"+
+              "Life is: " + minutesLifeTime);
         }
 
         @Override
         public void onFinish() {
           targetMarker.remove();
-          Log.i("PokemonLife", "" + pokemonInID + " Has Die 555+");
+          Log.i("PokemonLife", ": " + pokemonName +" "+ pokemonNumber + " Has Die.");
           LatLng position = new LatLng(latitudeOrigin, longitudeOrigin);
           setCamera(position, ZOOM_LEVEL_SIZE);
         }
