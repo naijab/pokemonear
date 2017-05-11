@@ -23,7 +23,7 @@ public interface PokemonServerService {
       @Field("password") String password);
 
   @GET("pokemon/catchable")
-  Call<List<PokemonCatchableModel>> getPokemon(@Header("pokemon_token") String token,
+  Call<PokemonCatchableModel> getPokemon(@Header("pokemon_token") String token,
       @Query("latitude") String latitude,
       @Query("longitude") String longitude);
 }
