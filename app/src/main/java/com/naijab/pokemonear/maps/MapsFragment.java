@@ -29,7 +29,6 @@ import com.naijab.pokemonear.R;
 import com.naijab.pokemonear.maps.pokemon.PokemonManager;
 import com.naijab.pokemonear.maps.pokemon.PokemonManager.FindPokemonCallBack;
 import com.naijab.pokemonear.utility.RandomUtility;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -39,9 +38,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
   public static final int RADIUS_METER = 2000;
   public static final int STROKE_WIDTH = 8;
   public static final int CIRCLE_FILL_COLOR = 0x3000ff00;
+  private static final double LATITUDE_ORIGIN = 37.4219877;
+  private static final double LONGITUDE_ORIGIN = -122.0840578;
 
-  private Double latitudeOrigin = 37.4219877;
-  private Double longitudeOrigin = -122.0840578;
+  private MapView mapView;
+  private TextView pokemonText;
+
+  private String userEmail = "";
+  private String userToken = "";
+
   private ArrayList<Integer> pokemonCount = new ArrayList<>();
   private HashMap<String, Marker> hashMapMarker = new HashMap<>();
 
@@ -50,20 +55,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
   private double randomLatitude;
   private double randomLongitude;
 
-  private MapView mapView;
   private GoogleMap mMap;
   private Marker targetMarker;
-  private CountDownTimer countDownTimer;
-
-  private String userEmail = "";
-  private String userToken = "";
-
-  private Thread thread;
-  private Handler handler = new Handler();
   private BitmapDescriptor icon;
 
-  private TextView pokemonText;
-  private SlidingUpPanelLayout slidingLayout;
+  private CountDownTimer countDownTimer;
+  private Thread thread;
+  private Handler handler = new Handler();
 
   public MapsFragment() {
     super();
@@ -114,8 +112,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
     randomTime = RandomUtility.getInstance().getTime(3000, 4000);
 
-    slidingLayout.addPanelSlideListener(onSlideListener());
-
     thread = new Thread() {
       public void run() {
         Log.d("Thread Run", "local Thread sleeping");
@@ -126,8 +122,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
   }
 
   private void getRandomPokemon() {
-    randomLocation = new RandomUtility().getInstance()
-        .getLocation(latitudeOrigin, longitudeOrigin, RADIUS_METER);
+    randomLocation = RandomUtility.getInstance()
+        .getLocation(LATITUDE_ORIGIN, LONGITUDE_ORIGIN, RADIUS_METER);
     randomLatitude = randomLocation.latitude;
     randomLongitude = randomLocation.longitude;
     findPokemon(userToken, String.valueOf(randomLatitude), String.valueOf(randomLongitude));
@@ -136,7 +132,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
   private void bindView(View rootView) {
     mapView = (MapView) rootView.findViewById(R.id.map);
     pokemonText = (TextView) rootView.findViewById(R.id.sum_pokemon);
-    slidingLayout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
   }
 
   private void findPokemon(String token,
@@ -150,14 +145,17 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
           public void onDetectPokemon(String pokemonID, String pokemonName, String pokemonNumber,
               double pokemonLatitude, double pokemonLongitude, long pokemonLife, int pokemonCount) {
             LatLng pokemonLocation = new LatLng(pokemonLatitude, pokemonLongitude);
-            setMarker(pokemonLocation,
-                pokemonName,
-                pokemonNumber,
-                pokemonID,
-                pokemonLife);
-            setCamera(pokemonLocation, ZOOM_LEVEL_SIZE);
-            showPokemonSum(pokemonCount);
 
+            targetMarker = hashMapMarker.get(pokemonID);
+            if (targetMarker == null) {
+              setMarker(pokemonLocation,
+                  pokemonName,
+                  pokemonNumber,
+                  pokemonID,
+                  pokemonLife);
+              setCamera(pokemonLocation, ZOOM_LEVEL_SIZE);
+              showPokemonSum(pokemonCount);
+            }
           }
 
           @Override
@@ -175,14 +173,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
   @Override
   public void onMapReady(GoogleMap googleMap) {
-    LatLng position = new LatLng(latitudeOrigin, longitudeOrigin);
+    LatLng position = new LatLng(LATITUDE_ORIGIN, LONGITUDE_ORIGIN);
     mMap = googleMap;
     initMapsView();
     setCircle(position, RADIUS_METER);
     setMarkerCenter(position, userEmail);
     setCamera(position, ZOOM_LEVEL_SIZE);
     randomLocation = RandomUtility.getInstance()
-        .getLocation(latitudeOrigin, longitudeOrigin, RADIUS_METER);
+        .getLocation(LATITUDE_ORIGIN, LONGITUDE_ORIGIN, RADIUS_METER);
 
   }
 
@@ -286,30 +284,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         public void onFinish() {
           targetMarker.remove();
           Log.i("PokemonLife", ": " + pokemonName +" "+ pokemonNumber + " Has Die.");
-          LatLng position = new LatLng(latitudeOrigin, longitudeOrigin);
+          LatLng position = new LatLng(LATITUDE_ORIGIN, LONGITUDE_ORIGIN);
           setCamera(position, ZOOM_LEVEL_SIZE);
         }
       }.start();
     }
 
 
-  }
-
-  private SlidingUpPanelLayout.PanelSlideListener onSlideListener() {
-    return new SlidingUpPanelLayout.PanelSlideListener() {
-      @Override
-      public void onPanelSlide(View view, float v) {
-
-      }
-
-      @Override
-      public void onPanelStateChanged(View panel,
-          SlidingUpPanelLayout.PanelState previousState,
-          SlidingUpPanelLayout.PanelState newState) {
-
-      }
-
-    };
   }
 
   @Override
@@ -320,7 +301,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
   @SuppressWarnings("UnusedParameters")
   private void onRestoreInstanceState(Bundle savedInstanceState) {
-    // Restore Instance (Fragment level's variables) State here
+
   }
 
   @Override
