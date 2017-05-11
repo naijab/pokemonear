@@ -7,7 +7,7 @@ public class RandomUtility {
 
   private static RandomUtility randomUtility;
 
-  public RandomUtility getInstance() {
+  public static RandomUtility getInstance() {
     if (randomUtility == null) {
         randomUtility = new RandomUtility();
     }
