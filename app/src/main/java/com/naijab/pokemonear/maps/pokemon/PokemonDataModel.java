@@ -2,16 +2,28 @@ package com.naijab.pokemonear.maps.pokemon;
 
 
 import org.parceler.Parcel;
+import org.parceler.ParcelConstructor;
 
 @Parcel
 public class PokemonDataModel {
 
-  long expiration_timestamp;
-  double latitude;
-  double longitude;
+  String id;
   String name;
   String number;
-  String id;
+  double latitude;
+  double longitude;
+  long expiration_timestamp;
+
+  @ParcelConstructor
+  public PokemonDataModel(String id, String name, String number, double latitude, double longitude,
+      long expiration_timestamp) {
+    this.id = id;
+    this.name = name;
+    this.number = number;
+    this.latitude = latitude;
+    this.longitude = longitude;
+    this.expiration_timestamp = expiration_timestamp;
+  }
 
   public long getExpiration_timestamp() {
     return expiration_timestamp;
