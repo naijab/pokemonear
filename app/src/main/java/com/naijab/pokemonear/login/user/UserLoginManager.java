@@ -34,7 +34,7 @@ public class UserLoginManager {
     return mEditor.commit();
   }
 
-  public void CheckUserLogin(
+  public void checkUserLogin(
       final Context context,
       final String username,
       final String password,
