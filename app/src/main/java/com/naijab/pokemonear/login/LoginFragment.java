@@ -1,7 +1,5 @@
 package com.naijab.pokemonear.login;
 
-import static android.content.Context.INPUT_METHOD_SERVICE;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,12 +13,15 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import com.naijab.pokemonear.R;
 import com.naijab.pokemonear.login.user.UserLoginManager;
 import com.naijab.pokemonear.login.user.UserLoginManager.UserLoginManagerCallBack;
 import com.naijab.pokemonear.maps.MapsActivity;
 import com.naijab.pokemonear.network.PokemonServerManager;
 import com.naijab.pokemonear.network.PokemonServerManager.CheckServerStatusCallBack;
+
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class LoginFragment extends Fragment {
 
@@ -36,6 +37,8 @@ public class LoginFragment extends Fragment {
   public static LoginFragment newInstance() {
     LoginFragment fragment = new LoginFragment();
     Bundle args = new Bundle();
+    // TODO "Login" ควรทำเป็น Static Final String ไว้
+    // TODO แต่ดูแล้วเหมือนจะไม่ได้ใช้ จะใส่ทำไม...
     args.putBoolean("Login", false);
     fragment.setArguments(args);
     return fragment;
@@ -85,9 +88,13 @@ public class LoginFragment extends Fragment {
     String password = editPassword.getText().toString();
 
     if (TextUtils.isEmpty(email)) {
+      // TODO อย่า Hardcode String ที่เป็นข้อความแสดงให้ User
+      // TODO เปลี่ยนไปใช้ String XML ซะ
       editUsername.setError("Please fill Email.");
       return;
     } else if (TextUtils.isEmpty(password)) {
+      // TODO อย่า Hardcode String ที่เป็นข้อความแสดงให้ User
+      // TODO เปลี่ยนไปใช้ String XML ซะ
       editPassword.setError("Please fill Password.");
       return;
     }

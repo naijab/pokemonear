@@ -12,6 +12,7 @@ import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
+// TODO ไม่ได้ใช้ก็ลบเถอะ ดูเหมือนว่าจะซ้ำกับ PokemonServerService
 public interface ServiceInterface {
 
     @GET("pokemon")
