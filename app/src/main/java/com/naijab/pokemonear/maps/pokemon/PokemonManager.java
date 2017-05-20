@@ -37,6 +37,15 @@ public class PokemonManager {
 
                     for (int i = 0; i < pokemonDetectSize; i++) {
 //                        pokemonDataList = new ArrayList<>(Arrays.asList(pokemonCatchableModel.getData()));
+                        // TODO พิมพ์แบบนี้เถอะ จะไป get(i) อะไรตั้งหลายรอบ
+//                        PokemonDataModel pokemonDataModel = pokemonCatchableModel.getData().get(i);
+//                        String pokemonID = pokemonDataModel.getId();
+//                        String pokemonName = pokemonDataModel.getName();
+//                        String pokemonNumber = pokemonDataModel.getNumber();
+//                        double pokemonLatitude = pokemonDataModel.getLatitude();
+//                        double pokemonLongitude = pokemonDataModel.getLongitude();
+//                        long pokemonLife = pokemonDataModel.getExpiration_timestamp();
+
                         List<PokemonDataModel> list = pokemonCatchableModel.getData();
                         String pokemonID = list.get(i).getId();
                         String pokemonName = list.get(i).getName();
@@ -45,6 +54,8 @@ public class PokemonManager {
                         double pokemonLongitude = list.get(i).getLongitude();
                         long pokemonLife = list.get(i).getExpiration_timestamp();
 
+                        // TODO ถ้าต้องโยน Parameter ออกมาทั้งหมดแบบนี้ โยน PokemonDataModel ไปเลยก็ได้
+//                        callBack.onDetectPokemon(pokemonDataModel);
                         callBack.onDetectPokemon(pokemonID,
                                 pokemonName,
                                 pokemonNumber,
@@ -71,6 +82,8 @@ public class PokemonManager {
 
     public interface FindPokemonCallBack {
 
+        // TODO ถ้าต้องโยน Parameter ออกมาทั้งหมดแบบนี้ โยน PokemonDataModel ไปเลยก็ได้
+//        void onDetectPokemon(PokemonDataModel pokemonDataModel);
         void onDetectPokemon(String pokemonID,
                              String pokemonName,
                              String pokemonNumber,

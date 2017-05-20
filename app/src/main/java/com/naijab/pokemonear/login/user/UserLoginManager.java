@@ -52,8 +52,7 @@ public class UserLoginManager {
                             // TODO อย่า Hardcode String แบบนี้ และจริงๆแล้วไม่จำเป็นต้องเช็คจาก Message ด้วยซ้ำ
                             // TODO มันเป็นแค่คำที่ใช้แสดงให้ User เห็น ถ้าวันไหนทำหลายภาษาขึ้นมา ก็ต้อง equals หลายๆข้อความหรือ?
                             if (response.body().getMessage().equals("Login Successful")) {
-                                // TODO hideKeyboard() อันนี้คำสั่งของ UI ไม่ควรใส่ไว้ใน Network Manager
-                                // TODO ถ้าจะใส่ก็ไปใส่ไว้ที่ Activity/Fragment นู่น
+                                // TODO ลบทิ้งด้วย เพราะเห็นใส่ไว้ใน Fragment ข้างนอกแล้ว
                                 hideKeyboard();
                                 String token = response.body().getToken();
                                 // TODO อันนี้ก็เป็นส่วนที่เชื่อมต่อกับ SharedPreference ที่ไม่ควรอยู่ใน Network Manager เหมือนกัน
