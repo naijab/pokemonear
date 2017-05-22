@@ -128,7 +128,7 @@ public class LoginFragment extends Fragment {
           @Override
           public void onUserLoginSuccess() {
             // TODO ใช้ String Resource แทน Hardcode
-            showToast("Login Success");
+            showToast(getString(R.string.login_success));
             hideKeyboard();
             goMapsActivity();
           }
@@ -136,19 +136,19 @@ public class LoginFragment extends Fragment {
           @Override
           public void onUserLoginUnableSave() {
             // TODO ใช้ String Resource แทน Hardcode
-            showToast("Can't save user.");
+            showToast(getString(R.string.login_unsave));
           }
 
           @Override
           public void onUserLoginInvalid() {
             // TODO ใช้ String Resource แทน Hardcode
-            showToast("Email or Password invalid.");
+            showToast(getString(R.string.login_error));
           }
 
           @Override
           public void onUserLoginFail() {
             // TODO ใช้ String Resource แทน Hardcode
-            showToast("Login has error.");
+            showToast(getString(R.string.login_has_error));
           }
 
           @Override
