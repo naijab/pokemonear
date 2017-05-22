@@ -265,8 +265,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
       final String pokemonNumber,
       final long pokemonLifeTime) {
 
-    final long LifeTime = pokemonLifeTime;
-    final long minutesLifeTime = (int) ((LifeTime / 10000000));
+    final long minutesLifeTime = (int) ((pokemonLifeTime / 10000000));
 
     targetMarker = hashMapMarker.get(pokemonID);
 
