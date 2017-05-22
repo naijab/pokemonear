@@ -1,68 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+
+  <com.google.android.gms.maps.MapView
+    android:id="@+id/map"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent" />
 
-    <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:sothree="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/sliding_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="bottom"
-        sothree:umanoDragView="@+id/drag_view"
-        sothree:umanoOverlay="true"
-        sothree:umanoPanelHeight="@dimen/xxx_large_even"
-        sothree:umanoParallaxOffset="@dimen/very_super_large"
-        sothree:umanoShadowHeight="@dimen/small_even">
+  <LinearLayout
+    android:id="@+id/linear_pokemon_count"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:background="#ffffff"
+    android:clickable="true"
+    android:focusable="false"
+    android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:padding="@dimen/x_large_even"
+      android:orientation="horizontal">
 
-            <com.google.android.gms.maps.MapView
-                android:id="@+id/map"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+      <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/pokemon_count"
+        android:textAlignment="center"
+        android:textSize="@dimen/text_x_size" />
 
-        </LinearLayout>
+      <TextView
+        android:id="@+id/sum_pokemon"
+        android:textStyle="bold"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text=""
+        android:textAlignment="center"
+        android:textSize="@dimen/text_x_size" />
 
-        <LinearLayout
-            android:id="@+id/drag_view"
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:background="#ffffff"
-            android:clickable="true"
-            android:focusable="false"
-            android:orientation="vertical">
+    </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="@dimen/x_large_even">
+  </LinearLayout>
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/pokemon_count"
-                    android:textAlignment="center"
-                    android:textSize="@dimen/text_x_size" />
-
-                <TextView
-                    android:id="@+id/sum_pokemon"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text=""
-                    android:textAlignment="center"
-                    android:textSize="@dimen/text_x_size"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
 </RelativeLayout>
