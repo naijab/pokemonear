@@ -90,12 +90,12 @@ public class LoginFragment extends Fragment {
     if (TextUtils.isEmpty(email)) {
       // TODO อย่า Hardcode String ที่เป็นข้อความแสดงให้ User
       // TODO เปลี่ยนไปใช้ String XML ซะ
-      editUsername.setError("Please fill Email.");
+      editUsername.setError(getString(R.string.alert_email));
       return;
     } else if (TextUtils.isEmpty(password)) {
       // TODO อย่า Hardcode String ที่เป็นข้อความแสดงให้ User
       // TODO เปลี่ยนไปใช้ String XML ซะ
-      editPassword.setError("Please fill Password.");
+      editPassword.setError(getString(R.string.alert_password));
       return;
     }
 
