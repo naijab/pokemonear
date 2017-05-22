@@ -6,6 +6,7 @@ import android.app.Application;
  * Created by Xiltron on 26/4/2560.
  */
 
+// TODO พิมพ์ชื่อผิดแน่ะ
 public class PokemoNearApplication extends Application {
 
   @Override

@@ -2,9 +2,9 @@ package com.naijab.pokemonear.server;
 
 import org.parceler.Parcel;
 
+// TODO ทำไมคลาสนี้ไม่อยู่ใน Package ที่ชื่อว่า network ล่ะ?
 @Parcel
 public class ServerStatusModel {
-
 
     String message;
 

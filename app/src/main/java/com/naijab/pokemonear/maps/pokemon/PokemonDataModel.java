@@ -12,6 +12,8 @@ public class PokemonDataModel {
   String number;
   double latitude;
   double longitude;
+  // TODO ควรใช้เป็น CamelCase ไปเลย ไม่ควรใช้ Snake Case
+  // TODO ใช้ @Serializable ช่วย Map JSON Field เพื่อเปลี่ยนให้กลายเป็นชื่อตัวแปรที่ต้องการได้
   long expiration_timestamp;
 
   @ParcelConstructor
@@ -25,10 +27,12 @@ public class PokemonDataModel {
     this.expiration_timestamp = expiration_timestamp;
   }
 
+  // TODO เพราะว่าไปตั้งชื่อตัวแปรเป็น Snake Case มันก็เลยกลายเป็น Method ที่มี _ แบบนี้
   public long getExpiration_timestamp() {
     return expiration_timestamp;
   }
 
+  // TODO เพราะว่าไปตั้งชื่อตัวแปรเป็น Snake Case มันก็เลยกลายเป็น Method ที่มี _ แบบนี้
   public void setExpiration_timestamp(long expiration_timestamp) {
     this.expiration_timestamp = expiration_timestamp;
   }
