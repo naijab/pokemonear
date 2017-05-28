@@ -37,14 +37,13 @@ public class PokemonManager {
 
                     for (int i = 0; i < pokemonDetectSize; i++) {
 //                        pokemonDataList = new ArrayList<>(Arrays.asList(pokemonCatchableModel.getData()));
-                        // TODO พิมพ์แบบนี้เถอะ จะไป get(i) อะไรตั้งหลายรอบ
 //                        PokemonDataModel pokemonDataModel = pokemonCatchableModel.getData().get(i);
 //                        String pokemonID = pokemonDataModel.getId();
 //                        String pokemonName = pokemonDataModel.getName();
 //                        String pokemonNumber = pokemonDataModel.getNumber();
 //                        double pokemonLatitude = pokemonDataModel.getLatitude();
 //                        double pokemonLongitude = pokemonDataModel.getLongitude();
-//                        long pokemonLife = pokemonDataModel.getExpiration_timestamp();
+//                        long pokemonLife = pokemonDataModel.getExpirationTimestamp();
 
                         List<PokemonDataModel> list = pokemonCatchableModel.getData();
                         String pokemonID = list.get(i).getId();
@@ -52,17 +51,14 @@ public class PokemonManager {
                         String pokemonNumber = list.get(i).getNumber();
                         double pokemonLatitude = list.get(i).getLatitude();
                         double pokemonLongitude = list.get(i).getLongitude();
-                        long pokemonLife = list.get(i).getExpiration_timestamp();
+                        long pokemonLife = list.get(i).getExpirationTimestamp();
 
-                        // TODO ถ้าต้องโยน Parameter ออกมาทั้งหมดแบบนี้ โยน PokemonDataModel ไปเลยก็ได้
-//                        callBack.onDetectPokemon(pokemonDataModel);
-                        callBack.onDetectPokemon(pokemonID,
-                                pokemonName,
-                                pokemonNumber,
-                                pokemonLatitude,
-                                pokemonLongitude,
-                                pokemonLife,
-                                pokemonDetectSize);
+                        PokemonDataModel pokemonDataModel = new PokemonDataModel(
+                            pokemonID, pokemonName,
+                            pokemonNumber, pokemonLatitude,
+                            pokemonLongitude, pokemonLife);
+
+                        callBack.onDetectPokemon(pokemonDataModel);
                     }
                 } else {
                     String message = response.body().getMessage();
@@ -82,15 +78,7 @@ public class PokemonManager {
 
     public interface FindPokemonCallBack {
 
-        // TODO ถ้าต้องโยน Parameter ออกมาทั้งหมดแบบนี้ โยน PokemonDataModel ไปเลยก็ได้
-//        void onDetectPokemon(PokemonDataModel pokemonDataModel);
-        void onDetectPokemon(String pokemonID,
-                             String pokemonName,
-                             String pokemonNumber,
-                             double pokemonLatitude,
-                             double pokemonLongitude,
-                             long pokemonLife,
-                             int pokemonCount);
+        void onDetectPokemon(PokemonDataModel pokemonDataModel);
 
         void onDetectPokemonFail(String message);
 
