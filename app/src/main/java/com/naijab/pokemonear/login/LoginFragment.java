@@ -37,9 +37,6 @@ public class LoginFragment extends Fragment {
   public static LoginFragment newInstance() {
     LoginFragment fragment = new LoginFragment();
     Bundle args = new Bundle();
-    // TODO "Login" ควรทำเป็น Static Final String ไว้
-    // TODO แต่ดูแล้วเหมือนจะไม่ได้ใช้ จะใส่ทำไม...
-    args.putBoolean("Login", false);
     fragment.setArguments(args);
     return fragment;
   }
@@ -88,13 +85,9 @@ public class LoginFragment extends Fragment {
     String password = editPassword.getText().toString();
 
     if (TextUtils.isEmpty(email)) {
-      // TODO อย่า Hardcode String ที่เป็นข้อความแสดงให้ User
-      // TODO เปลี่ยนไปใช้ String XML ซะ
       editUsername.setError(getString(R.string.alert_email));
       return;
     } else if (TextUtils.isEmpty(password)) {
-      // TODO อย่า Hardcode String ที่เป็นข้อความแสดงให้ User
-      // TODO เปลี่ยนไปใช้ String XML ซะ
       editPassword.setError(getString(R.string.alert_password));
       return;
     }
@@ -127,7 +120,6 @@ public class LoginFragment extends Fragment {
         new UserLoginManagerCallBack() {
           @Override
           public void onUserLoginSuccess() {
-            // TODO ใช้ String Resource แทน Hardcode
             showToast(getString(R.string.login_success));
             hideKeyboard();
             goMapsActivity();
@@ -135,19 +127,16 @@ public class LoginFragment extends Fragment {
 
           @Override
           public void onUserLoginUnableSave() {
-            // TODO ใช้ String Resource แทน Hardcode
             showToast(getString(R.string.login_unsave));
           }
 
           @Override
           public void onUserLoginInvalid() {
-            // TODO ใช้ String Resource แทน Hardcode
             showToast(getString(R.string.login_error));
           }
 
           @Override
           public void onUserLoginFail() {
-            // TODO ใช้ String Resource แทน Hardcode
             showToast(getString(R.string.login_has_error));
           }
 
