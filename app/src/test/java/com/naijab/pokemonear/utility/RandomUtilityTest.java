@@ -21,7 +21,7 @@ public class RandomUtilityTest {
   }
 
   @Test
-  public void get_location() {
+  public void getLocation_random_not_be_same_as_origin() {
 
     for (int i = 0; i < 100; i++) {
 

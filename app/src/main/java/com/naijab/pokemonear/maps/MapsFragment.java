@@ -26,6 +26,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.naijab.pokemonear.R;
+import com.naijab.pokemonear.maps.pokemon.PokemonDataModel;
 import com.naijab.pokemonear.maps.pokemon.PokemonManager;
 import com.naijab.pokemonear.maps.pokemon.PokemonManager.FindPokemonCallBack;
 import com.naijab.pokemonear.utility.RandomUtility;
@@ -142,11 +143,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         longitude,
         new FindPokemonCallBack() {
           @Override
-          public void onDetectPokemon(String pokemonID, String pokemonName, String pokemonNumber,
-              double pokemonLatitude, double pokemonLongitude, long pokemonLife, int pokemonCount) {
-            LatLng pokemonLocation = new LatLng(pokemonLatitude, pokemonLongitude);
+          public void onDetectPokemon(PokemonDataModel pokemon) {
+            LatLng pokemonLocation = new LatLng(pokemon.getLatitude(), pokemon.getLongitude());
 
-            targetMarker = hashMapMarker.get(pokemonID);
+            targetMarker = hashMapMarker.get(pokemon.getId());
             if (targetMarker == null) {
               setMarker(pokemonLocation,
                   pokemonName,

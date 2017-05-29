@@ -2,7 +2,6 @@ package com.naijab.pokemonear.network;
 
 import com.naijab.pokemonear.login.user.UserLoginModel;
 import com.naijab.pokemonear.maps.pokemon.PokemonCatchableModel;
-import com.naijab.pokemonear.server.ServerStatusModel;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
