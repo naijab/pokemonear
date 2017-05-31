@@ -143,18 +143,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         longitude,
         new FindPokemonCallBack() {
           @Override
-          public void onDetectPokemon(PokemonDataModel pokemon) {
+          public void onDetectPokemon(PokemonDataModel pokemon, int pokemonSize) {
             LatLng pokemonLocation = new LatLng(pokemon.getLatitude(), pokemon.getLongitude());
-
             targetMarker = hashMapMarker.get(pokemon.getId());
             if (targetMarker == null) {
-              setMarker(pokemonLocation,
-                  pokemonName,
-                  pokemonNumber,
-                  pokemonID,
-                  pokemonLife);
+              setMarker(pokemon, pokemonLocation);
               setCamera(pokemonLocation, ZOOM_LEVEL_SIZE);
-              showPokemonSum(pokemonCount);
+              showPokemonSum(pokemonSize);
             }
           }
 
@@ -211,25 +206,24 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     mMap.addCircle(circleOptions);
   }
 
-  private void setMarker(LatLng position, String pokemonName, String pokemonNumber,
-      String pokemonID, long pokemonLife) {
+  private void setMarker(PokemonDataModel pokemon, LatLng location) {
 
     try {
-      int id = getResources().getIdentifier("ic_pokemon_no_" + pokemonNumber,
+      int id = getResources().getIdentifier("ic_pokemon_no_" + pokemon.getNumber(),
           "drawable", getActivity().getPackageName());
       icon = BitmapDescriptorFactory.fromResource(id);
     } catch (IllegalArgumentException e) {
       Log.e("icon: ", "" + e);
     }
     MarkerOptions markerOptions = new MarkerOptions();
-    markerOptions.title("Name: " + pokemonName)
-        .snippet("Number: " + pokemonNumber)
-        .position(position)
+    markerOptions.title("Name: " + pokemon.getName())
+        .snippet("Number: " + pokemon.getNumber())
+        .position(location)
         .icon(icon);
     Marker locationMarker = mMap.addMarker(markerOptions);
-    hashMapMarker.put(pokemonID, locationMarker);
+    hashMapMarker.put(pokemon.getId(), locationMarker);
     locationMarker.showInfoWindow();
-    removeMarker(pokemonID, pokemonName, pokemonNumber, pokemonLife);
+    removeMarker(pokemon);
   }
 
   private void setCamera(LatLng position, int ZoomLevelSize) {
@@ -242,8 +236,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     Toast.makeText(getActivity(), text, Toast.LENGTH_SHORT).show();
   }
 
-  private void showPokemonSum(int x) {
-    pokemonCount.add(x);
+  private void showPokemonSum(int pokemonSize) {
+    pokemonCount.add(pokemonSize);
     int sum = 0;
     for (int i = 0; i < pokemonCount.size(); i++) {
       sum += pokemonCount.get(i);
@@ -260,30 +254,28 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     }
   }
 
-  private void removeMarker(final String pokemonID,
-      final String pokemonName,
-      final String pokemonNumber,
-      final long pokemonLifeTime) {
+  private void removeMarker(final PokemonDataModel pokemon) {
 
-    final long LifeTime = pokemonLifeTime;
-    final long minutesLifeTime = (int) ((LifeTime / 10000000));
+    long LifeTime = pokemon.getExpirationTimestamp();
+    long second = 1000;
+    final long minutesLifeTime = (int) ((LifeTime / 10000 * second));
 
-    targetMarker = hashMapMarker.get(pokemonID);
+    targetMarker = hashMapMarker.get(pokemon.getId());
 
     if (targetMarker != null) {
       countDownTimer = new CountDownTimer(minutesLifeTime, 1000) {
         @Override
         public void onTick(long millisUntilFinished) {
-          Log.i("PokemonLife", "Has life : " + pokemonID + "\n" +
-              "Name: " + pokemonName+"\n"+
-              "Number: " + pokemonNumber+"\n"+
+          Log.i("PokemonLife", "Has life : " + pokemon.getId() + "\n" +
+              "Name: " + pokemon.getName()+"\n"+
+              "Number: " + pokemon.getNumber()+"\n"+
               "Life is: " + minutesLifeTime);
         }
 
         @Override
         public void onFinish() {
           targetMarker.remove();
-          Log.i("PokemonLife", ": " + pokemonName +" "+ pokemonNumber + " Has Die.");
+          Log.i("PokemonLife", ": " + pokemon.getName() +" "+ pokemon.getNumber() + " Has Die.");
           LatLng position = new LatLng(LATITUDE_ORIGIN, LONGITUDE_ORIGIN);
           setCamera(position, ZOOM_LEVEL_SIZE);
         }
