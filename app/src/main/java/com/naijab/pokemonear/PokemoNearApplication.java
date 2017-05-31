@@ -1,13 +1,14 @@
 package com.naijab.pokemonear;
 
 import android.app.Application;
+import android.content.Context;
 
 /**
  * Created by Xiltron on 26/4/2560.
  */
-
-// TODO พิมพ์ชื่อผิดแน่ะ -- แอพนี้ชื่อ PokemoNear ครับพิมพ์ถูกแล้ว
 public class PokemoNearApplication extends Application {
+
+  private static Context mContext;
 
   @Override
   public void onCreate() {
@@ -16,7 +17,11 @@ public class PokemoNearApplication extends Application {
   }
 
   private void init() {
+    mContext = this;
+  }
 
+  public static Context getContext() {
+    return mContext;
   }
 
   @Override

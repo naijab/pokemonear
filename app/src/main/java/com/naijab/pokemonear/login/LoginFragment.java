@@ -116,7 +116,7 @@ public class LoginFragment extends Fragment {
   }
 
   private void checkLogin(String username, String password) {
-    UserLoginManager.getInstance().checkUserLogin(getActivity(), username, password,
+    UserLoginManager.getInstance().checkUserLogin(username, password,
         new UserLoginManagerCallBack() {
           @Override
           public void onUserLoginSuccess() {
