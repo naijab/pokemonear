@@ -263,19 +263,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     targetMarker = hashMapMarker.get(pokemon.getId());
 
     if (targetMarker != null) {
-      countDownTimer = new CountDownTimer(minutesLifeTime, 1000) {
+      countDownTimer = new CountDownTimer(minutesLifeTime, second) {
         @Override
         public void onTick(long millisUntilFinished) {
           Log.i("PokemonLife", "Has life : " + pokemon.getId() + "\n" +
-              "Name: " + pokemon.getName()+"\n"+
-              "Number: " + pokemon.getNumber()+"\n"+
+              "Name: " + pokemon.getName() + "\n" +
+              "Number: " + pokemon.getNumber() + "\n" +
               "Life is: " + minutesLifeTime);
         }
 
         @Override
         public void onFinish() {
           targetMarker.remove();
-          Log.i("PokemonLife", ": " + pokemon.getName() +" "+ pokemon.getNumber() + " Has Die.");
+          Log.i("PokemonLife", ": " + pokemon.getName() + " " + pokemon.getNumber() + " Has Die.");
           LatLng position = new LatLng(LATITUDE_ORIGIN, LONGITUDE_ORIGIN);
           setCamera(position, ZOOM_LEVEL_SIZE);
         }
